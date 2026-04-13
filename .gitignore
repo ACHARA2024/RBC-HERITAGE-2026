@@ -1,0 +1,5 @@
+node_modules/
+sweepstake.db
+sweepstake.db-shm
+sweepstake.db-wal
+.env
