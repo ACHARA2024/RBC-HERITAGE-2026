@@ -348,7 +348,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
 .hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
 .hero-overlay{position:relative;z-index:2;padding:2rem 1.5rem}
-.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.75) 0%,rgba(26,74,46,0.60) 100%);z-index:1}
+.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.35) 0%,rgba(26,74,46,0.25) 100%);z-index:1}
 .hero-overlay h1{font-size:clamp(1.8rem,5vw,3.2rem);color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,0.6);font-weight:800;margin-bottom:0.5rem}
 .hero-overlay p{font-size:1rem;color:rgba(255,255,255,0.9);margin-bottom:0.25rem}
 .hero-sub{color:var(--gold-light)!important;font-size:0.95rem!important;margin-top:0.5rem!important}
@@ -949,7 +949,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
 .hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
 .hero-overlay{position:relative;z-index:2;padding:2rem 1.5rem}
-.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.75) 0%,rgba(26,74,46,0.60) 100%);z-index:1}
+.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.35) 0%,rgba(26,74,46,0.25) 100%);z-index:1}
 .hero-overlay h1{font-size:clamp(1.8rem,5vw,3.2rem);color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,0.6);font-weight:800;margin-bottom:0.5rem}
 .hero-overlay p{font-size:1rem;color:rgba(255,255,255,0.9);margin-bottom:0.25rem}
 .hero-sub{color:var(--gold-light)!important;font-size:0.95rem!important;margin-top:0.5rem!important}
