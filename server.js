@@ -344,7 +344,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 @media(max-width:768px){.nav-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--green-mid);flex-direction:column;padding:1rem;gap:0.5rem;border-bottom:2px solid var(--gold);box-shadow:var(--shadow)}.nav-links.open{display:flex}.nav-links a{width:100%;text-align:center;padding:0.6rem}}
 .hero,.hero-sm{position:relative;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center}
 .hero{min-height:420px}.hero-sm{min-height:220px}
-.hero-celebrate{background-image:url("/golf1.jpg");background-color:var(--green-mid)}
+.hero-celebrate{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 15%}
 .hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
 .hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
 .hero-overlay{position:relative;z-index:2;padding:2rem 1.5rem}
@@ -955,7 +955,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 @media(max-width:768px){.nav-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--green-mid);flex-direction:column;padding:1rem;gap:0.5rem;border-bottom:2px solid var(--gold);box-shadow:var(--shadow)}.nav-links.open{display:flex}.nav-links a{width:100%;text-align:center;padding:0.6rem}}
 .hero,.hero-sm{position:relative;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center}
 .hero{min-height:420px}.hero-sm{min-height:220px}
-.hero-celebrate{background-image:url("/golf1.jpg");background-color:var(--green-mid)}
+.hero-celebrate{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 15%}
 .hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
 .hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
 .hero-overlay{position:relative;z-index:2;padding:2rem 1.5rem}
