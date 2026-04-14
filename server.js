@@ -343,7 +343,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .nav-toggle{display:none;background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;padding:0.25rem}
 @media(max-width:768px){.nav-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--green-mid);flex-direction:column;padding:1rem;gap:0.5rem;border-bottom:2px solid var(--gold);box-shadow:var(--shadow)}.nav-links.open{display:flex}.nav-links a{width:100%;text-align:center;padding:0.6rem}}
 .hero,.hero-sm{position:relative;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center}
-.hero{min-height:420px}.hero-sm{min-height:220px}
+.hero{min-height:100vh}.hero-sm{min-height:220px}
 .hero-celebrate{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 15%}
 .hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
 .hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
@@ -666,11 +666,6 @@ function myEntryPage(user, entry, golfers, err = '', success = '') {
         <p class="hero-sub">Entry Fee: €${ENTRY_FEE} &bull; Deadline: Wednesday 15 April 2026, 11:59pm Irish time</p>
       </div>
     </div>
-    <div class="photo-strip">
-      <div class="photo-panel"><img src="/john-daly.jpg" alt="John Daly"></div>
-      <div class="photo-panel"><img src="/john-daly-1.jpg" alt="John Daly"></div>
-      <div class="photo-panel"><img src="/john-daly-2.jpg" alt="John Daly"></div>
-    </div>
     <div class="container">
       <div class="card center-card">
         <div class="setup-icon">🏌️</div>
@@ -704,11 +699,6 @@ function myEntryPage(user, entry, golfers, err = '', success = '') {
         <p>Harbour Town Golf Links &bull; Hilton Head Island, SC &bull; 16–19 April 2026</p>
         <p class="hero-sub">Entry Fee: €${ENTRY_FEE} &bull; Deadline: Wednesday 15 April 2026, 11:59pm Irish time</p>
       </div>
-    </div>
-    <div class="photo-strip">
-      <div class="photo-panel"><img src="/john-daly.jpg" alt="John Daly"></div>
-      <div class="photo-panel"><img src="/john-daly-1.jpg" alt="John Daly"></div>
-      <div class="photo-panel"><img src="/john-daly-2.jpg" alt="John Daly"></div>
     </div>
     <div class="container">
       ${flash('error', err)}
@@ -954,7 +944,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .nav-toggle{display:none;background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;padding:0.25rem}
 @media(max-width:768px){.nav-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--green-mid);flex-direction:column;padding:1rem;gap:0.5rem;border-bottom:2px solid var(--gold);box-shadow:var(--shadow)}.nav-links.open{display:flex}.nav-links a{width:100%;text-align:center;padding:0.6rem}}
 .hero,.hero-sm{position:relative;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center}
-.hero{min-height:420px}.hero-sm{min-height:220px}
+.hero{min-height:100vh}.hero-sm{min-height:220px}
 .hero-celebrate{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 15%}
 .hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
 .hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
