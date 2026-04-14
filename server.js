@@ -68,9 +68,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     full_name     TEXT    NOT NULL,
-    email         TEXT    UNIQUE NOT NULL,
-    phone         TEXT    NOT NULL,
-    password_hash TEXT    NOT NULL,
+    phone         TEXT    UNIQUE NOT NULL,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
   );
   CREATE TABLE IF NOT EXISTS golfers (
@@ -346,17 +344,24 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 @media(max-width:768px){.nav-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--green-mid);flex-direction:column;padding:1rem;gap:0.5rem;border-bottom:2px solid var(--gold);box-shadow:var(--shadow)}.nav-links.open{display:flex}.nav-links a{width:100%;text-align:center;padding:0.6rem}}
 .hero,.hero-sm{position:relative;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center}
 .hero{min-height:420px}.hero-sm{min-height:220px}
-.hero-celebrate{background-image:url("/celebration.jpg");background-color:var(--green-mid)}
-.hero-jump{background-image:url("/jump.jpg");background-color:var(--green-mid)}
-.hero-quail{background-image:url("/quail.jpg");background-color:var(--green-mid)}
+.hero-celebrate{background-image:url("/golf1.jpg");background-color:var(--green-mid)}
+.hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
+.hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
 .hero-overlay{position:relative;z-index:2;padding:2rem 1.5rem}
-.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.88) 0%,rgba(26,74,46,0.78) 100%);z-index:1}
+.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.75) 0%,rgba(26,74,46,0.60) 100%);z-index:1}
 .hero-overlay h1{font-size:clamp(1.8rem,5vw,3.2rem);color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,0.6);font-weight:800;margin-bottom:0.5rem}
 .hero-overlay p{font-size:1rem;color:rgba(255,255,255,0.9);margin-bottom:0.25rem}
 .hero-sub{color:var(--gold-light)!important;font-size:0.95rem!important;margin-top:0.5rem!important}
-.photo-strip{display:grid;grid-template-columns:repeat(3,1fr);height:180px}
-@media(max-width:600px){.photo-strip{height:100px}}
-.photo-panel{background-size:cover;background-position:center;background-color:var(--green-mid);border-bottom:3px solid var(--gold)}
+.photo-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--green-dark);border-bottom:3px solid var(--gold)}
+.photo-panel{overflow:hidden;height:260px;position:relative;cursor:zoom-in}
+.photo-panel img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform 0.4s ease}
+.photo-panel img:hover{transform:scale(1.06)}
+.photo-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));color:var(--gold-light);font-size:0.75rem;font-weight:600;padding:0.5rem 0.6rem 0.4rem;letter-spacing:0.04em;text-transform:uppercase}
+.photo-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--green-dark)}
+.gallery-panel{overflow:hidden;height:200px;position:relative;cursor:zoom-in}
+.gallery-panel img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transition:transform 0.4s ease}
+.gallery-panel img:hover{transform:scale(1.06)}
+@media(max-width:600px){.photo-panel{height:150px}.gallery-panel{height:120px}}
 .container{max-width:1100px;margin:0 auto;padding:2rem 1rem}
 .rules-container{max-width:960px}
 .cards-row{display:grid;gap:1rem;margin-bottom:1.5rem}
@@ -388,6 +393,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .auth-form{margin-top:1rem}
 .auth-alt{text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--text-muted)}
 .auth-alt.small{font-size:0.78rem;margin-top:0.5rem}
+.payment-notice{background:rgba(200,169,74,0.12);border:1.5px solid var(--gold);border-radius:var(--radius-sm);padding:0.85rem 1rem;margin-bottom:1.2rem;font-size:0.88rem;color:var(--text);line-height:1.5}
 .flash{padding:0.85rem 1rem;border-radius:var(--radius-sm);margin-bottom:1rem;font-size:0.9rem;font-weight:500}
 .flash-error{background:rgba(224,82,82,0.2);border-left:4px solid var(--danger);color:#f0a0a0}
 .flash-success{background:rgba(76,175,118,0.2);border-left:4px solid var(--success);color:#90d8a8}
@@ -527,12 +533,8 @@ function loginPage(err = '') {
       ${flash('error', err)}
       <form method="POST" action="/login" class="auth-form">
         <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" name="email" required placeholder="you@example.com">
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" name="password" required placeholder="Your password">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" required placeholder="e.g. 087 123 4567" autocomplete="tel">
         </div>
         <button type="submit" class="btn btn-gold btn-full">Sign In</button>
       </form>
@@ -551,30 +553,22 @@ function registerPage(err = '', vals = {}) {
       <h1>Create Account</h1>
       <p class="auth-sub">2026 RBC Heritage Sweepstake</p>
       ${flash('error', err)}
+      <div class="payment-notice">
+        <strong>⚠️ Important:</strong> Registering does <strong>not</strong> confirm your place.<br>
+        You must send your <strong>€20 stake via Revolut</strong> to the organiser — your entry will only be activated once payment is received before the deadline.
+      </div>
       <form method="POST" action="/register" class="auth-form">
         <div class="form-group">
           <label>Full Name</label>
           <input type="text" name="full_name" required value="${esc(vals.full_name||'')}" placeholder="Your full name">
         </div>
         <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" name="email" required value="${esc(vals.email||'')}" placeholder="you@example.com">
-        </div>
-        <div class="form-group">
           <label>Phone Number</label>
-          <input type="tel" name="phone" required value="${esc(vals.phone||'')}" placeholder="e.g. 087 123 4567">
+          <input type="tel" name="phone" required value="${esc(vals.phone||'')}" placeholder="e.g. 087 123 4567" autocomplete="tel">
         </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" name="password" required minlength="6" placeholder="Min. 6 characters">
-        </div>
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <input type="password" name="confirm_password" required placeholder="Repeat password">
-        </div>
-        <button type="submit" class="btn btn-gold btn-full">Create Account</button>
+        <button type="submit" class="btn btn-gold btn-full">Register</button>
       </form>
-      <p class="auth-alt">Already have an account? <a href="/login">Sign in</a></p>
+      <p class="auth-alt">Already registered? <a href="/login">Sign in with your phone number</a></p>
     </div>
   </section>`, { activeNav: 'register' });
 }
@@ -673,9 +667,9 @@ function myEntryPage(user, entry, golfers, err = '', success = '') {
       </div>
     </div>
     <div class="photo-strip">
-      <div class="photo-panel" style="background-image:url('/celebration.jpg')"></div>
-      <div class="photo-panel" style="background-image:url('/jump.jpg')"></div>
-      <div class="photo-panel" style="background-image:url('/quail.jpg')"></div>
+      <div class="photo-panel"><img src="/john-daly.jpg" alt="John Daly"></div>
+      <div class="photo-panel"><img src="/john-daly-1.jpg" alt="John Daly"></div>
+      <div class="photo-panel"><img src="/john-daly-2.jpg" alt="John Daly"></div>
     </div>
     <div class="container">
       <div class="card center-card">
@@ -712,9 +706,9 @@ function myEntryPage(user, entry, golfers, err = '', success = '') {
       </div>
     </div>
     <div class="photo-strip">
-      <div class="photo-panel" style="background-image:url('/celebration.jpg')"></div>
-      <div class="photo-panel" style="background-image:url('/jump.jpg')"></div>
-      <div class="photo-panel" style="background-image:url('/quail.jpg')"></div>
+      <div class="photo-panel"><img src="/john-daly.jpg" alt="John Daly"></div>
+      <div class="photo-panel"><img src="/john-daly-1.jpg" alt="John Daly"></div>
+      <div class="photo-panel"><img src="/john-daly-2.jpg" alt="John Daly"></div>
     </div>
     <div class="container">
       ${flash('error', err)}
@@ -961,17 +955,24 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 @media(max-width:768px){.nav-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--green-mid);flex-direction:column;padding:1rem;gap:0.5rem;border-bottom:2px solid var(--gold);box-shadow:var(--shadow)}.nav-links.open{display:flex}.nav-links a{width:100%;text-align:center;padding:0.6rem}}
 .hero,.hero-sm{position:relative;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center}
 .hero{min-height:420px}.hero-sm{min-height:220px}
-.hero-celebrate{background-image:url("/celebration.jpg");background-color:var(--green-mid)}
-.hero-jump{background-image:url("/jump.jpg");background-color:var(--green-mid)}
-.hero-quail{background-image:url("/quail.jpg");background-color:var(--green-mid)}
+.hero-celebrate{background-image:url("/golf1.jpg");background-color:var(--green-mid)}
+.hero-jump{background-image:url("/shaggy.jpg");background-color:var(--green-mid)}
+.hero-quail{background-image:url("/john-daly.jpg");background-color:var(--green-mid);background-position:center 20%}
 .hero-overlay{position:relative;z-index:2;padding:2rem 1.5rem}
-.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.88) 0%,rgba(26,74,46,0.78) 100%);z-index:1}
+.hero::before,.hero-sm::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,31,22,0.75) 0%,rgba(26,74,46,0.60) 100%);z-index:1}
 .hero-overlay h1{font-size:clamp(1.8rem,5vw,3.2rem);color:var(--gold);text-shadow:0 2px 8px rgba(0,0,0,0.6);font-weight:800;margin-bottom:0.5rem}
 .hero-overlay p{font-size:1rem;color:rgba(255,255,255,0.9);margin-bottom:0.25rem}
 .hero-sub{color:var(--gold-light)!important;font-size:0.95rem!important;margin-top:0.5rem!important}
-.photo-strip{display:grid;grid-template-columns:repeat(3,1fr);height:180px}
-@media(max-width:600px){.photo-strip{height:100px}}
-.photo-panel{background-size:cover;background-position:center;background-color:var(--green-mid);border-bottom:3px solid var(--gold)}
+.photo-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--green-dark);border-bottom:3px solid var(--gold)}
+.photo-panel{overflow:hidden;height:260px;position:relative;cursor:zoom-in}
+.photo-panel img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform 0.4s ease}
+.photo-panel img:hover{transform:scale(1.06)}
+.photo-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));color:var(--gold-light);font-size:0.75rem;font-weight:600;padding:0.5rem 0.6rem 0.4rem;letter-spacing:0.04em;text-transform:uppercase}
+.photo-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--green-dark)}
+.gallery-panel{overflow:hidden;height:200px;position:relative;cursor:zoom-in}
+.gallery-panel img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transition:transform 0.4s ease}
+.gallery-panel img:hover{transform:scale(1.06)}
+@media(max-width:600px){.photo-panel{height:150px}.gallery-panel{height:120px}}
 .container{max-width:1100px;margin:0 auto;padding:2rem 1rem}
 .rules-container{max-width:960px}
 .cards-row{display:grid;gap:1rem;margin-bottom:1.5rem}
@@ -1003,6 +1004,7 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .auth-form{margin-top:1rem}
 .auth-alt{text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--text-muted)}
 .auth-alt.small{font-size:0.78rem;margin-top:0.5rem}
+.payment-notice{background:rgba(200,169,74,0.12);border:1.5px solid var(--gold);border-radius:var(--radius-sm);padding:0.85rem 1rem;margin-bottom:1.2rem;font-size:0.88rem;color:var(--text);line-height:1.5}
 .flash{padding:0.85rem 1rem;border-radius:var(--radius-sm);margin-bottom:1rem;font-size:0.9rem;font-weight:500}
 .flash-error{background:rgba(224,82,82,0.2);border-left:4px solid var(--danger);color:#f0a0a0}
 .flash-success{background:rgba(76,175,118,0.2);border-left:4px solid var(--success);color:#90d8a8}
@@ -1180,9 +1182,9 @@ function adminUsersPage(msg = '') {
   return layout('Admin: Users', `
   <div class="admin-hero"><h1>Users (${users.length})</h1></div>
   <div class="container">${flash('success', msg)}<div class="card"><div class="table-wrap">
-    <table class="data-table"><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th class="center">Entry</th><th class="center">Paid</th><th>Joined</th><th class="center">Action</th></tr></thead>
+    <table class="data-table"><thead><tr><th>#</th><th>Name</th><th>Phone</th><th class="center">Entry</th><th class="center">Paid</th><th>Joined</th><th class="center">Action</th></tr></thead>
     <tbody>${users.map(u => `<tr>
-      <td>${u.id}</td><td>${esc(u.full_name)}</td><td>${esc(u.email)}</td><td>${esc(u.phone)}</td>
+      <td>${u.id}</td><td>${esc(u.full_name)}</td><td>${esc(u.phone)}</td>
       <td class="center">${u.eid?'✓':'—'}</td>
       <td class="center">${u.eid?(u.is_paid?'<span class="text-success">✓ Paid</span>':'<span class="text-warning">Unpaid</span>'):'—'}</td>
       <td>${fmtDate(u.created_at)}</td>
@@ -1321,25 +1323,23 @@ app.get('/login',  (req, res) => { if (req.session.userId) return res.redirect('
 app.get('/register', (req, res) => { if (req.session.userId) return res.redirect('/my-entry'); res.send(registerPage()); });
 app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/login'); });
 
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.send(loginPage('Please fill in all fields.'));
-  const user = db.prepare('SELECT * FROM users WHERE email=?').get(email.trim().toLowerCase());
-  if (!user || !(await bcrypt.compare(password, user.password_hash))) return res.send(loginPage('Invalid email or password.'));
+app.post('/login', (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.send(loginPage('Please enter your phone number.'));
+  const cleanPhone = phone.trim().replace(/\s+/g, '');
+  const user = db.prepare('SELECT * FROM users WHERE phone=?').get(cleanPhone);
+  if (!user) return res.send(loginPage('No account found with that phone number.'));
   req.session.userId = user.id;
   res.redirect('/my-entry');
 });
 
-app.post('/register', async (req, res) => {
-  const { full_name, email, phone, password, confirm_password } = req.body;
-  const vals = { full_name, email, phone };
-  if (!full_name || !email || !phone || !password || !confirm_password) return res.send(registerPage('Please fill in all fields.', vals));
-  if (password !== confirm_password) return res.send(registerPage('Passwords do not match.', vals));
-  if (password.length < 6) return res.send(registerPage('Password must be at least 6 characters.', vals));
-  const cleanEmail = email.trim().toLowerCase();
-  if (db.prepare('SELECT id FROM users WHERE email=?').get(cleanEmail)) return res.send(registerPage('An account with that email already exists.', vals));
-  const hash = await bcrypt.hash(password, SALT);
-  const result = db.prepare('INSERT INTO users (full_name, email, phone, password_hash) VALUES (?,?,?,?)').run(full_name.trim(), cleanEmail, phone.trim(), hash);
+app.post('/register', (req, res) => {
+  const { full_name, phone } = req.body;
+  const vals = { full_name, phone };
+  if (!full_name || !phone) return res.send(registerPage('Please fill in all fields.', vals));
+  const cleanPhone = phone.trim().replace(/\s+/g, '');
+  if (db.prepare('SELECT id FROM users WHERE phone=?').get(cleanPhone)) return res.send(registerPage('An account with that phone number already exists.', vals));
+  const result = db.prepare('INSERT INTO users (full_name, phone) VALUES (?,?)').run(full_name.trim(), cleanPhone);
   req.session.userId = result.lastInsertRowid;
   res.redirect('/my-entry');
 });
