@@ -300,6 +300,33 @@ function calcLeaderboard() {
 
 const formatPrize = n => n > 0 ? `€${n.toFixed(2)}` : '—';
 const fmtDate = d => d ? new Date(d).toLocaleString('en-IE', { timeZone: 'Europe/Dublin' }) : '—';
+
+// Format strokes relative to par: -3, E, +2. Returns null if no rounds played yet.
+function fmtPar(strokes, par, roundsPlayed) {
+  if (!roundsPlayed) return null;
+  const diff = strokes - (par * roundsPlayed);
+  if (diff === 0) return { label: 'E', cls: 'par-even' };
+  if (diff < 0)   return { label: String(diff), cls: 'par-under' };
+  return { label: '+' + diff, cls: 'par-over' };
+}
+
+// Count rounds played for a score row
+function roundsPlayed(sc) {
+  if (!sc) return 0;
+  const r = [sc.round1, sc.round2, sc.round3, sc.round4];
+  return r.filter(v => v != null).length;
+}
+
+// Get combined par display for an entry (3 golfers)
+function combinedParDisplay(sc1, sc2, sc3, strokes1, strokes2, strokes3, par) {
+  const rp = roundsPlayed(sc1) + roundsPlayed(sc2) + roundsPlayed(sc3);
+  if (!rp) return { label: '—', cls: '' };
+  const totalStrokes = strokes1 + strokes2 + strokes3;
+  const diff = totalStrokes - (par * rp);
+  if (diff === 0) return { label: 'E', cls: 'par-even' };
+  if (diff < 0)   return { label: String(diff), cls: 'par-under' };
+  return { label: '+' + diff, cls: 'par-over' };
+}
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -429,6 +456,25 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .lb-stat-val{display:block;font-size:1.4rem;font-weight:800;color:var(--gold)}
 .lb-stat-label{display:block;font-size:0.72rem;color:var(--text-muted);text-transform:uppercase}
 .prize-box{background:var(--green-mid);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:0.5rem 1rem;text-align:center;min-width:80px}
+.lb-card{background:var(--green-card);border:1px solid var(--green-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.75rem;display:flex;gap:1.25rem;align-items:center}
+.lb-card-podium{border-color:var(--gold);background:rgba(200,169,74,0.07)}
+.lb-card-left{display:flex;flex-direction:column;align-items:center;min-width:56px;gap:0.1rem}
+.lb-rank{font-size:1.3rem;font-weight:800;line-height:1}
+.lb-combined{font-size:2rem;font-weight:900;line-height:1;margin-top:0.25rem}
+.lb-combined-label{font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}
+.lb-card-mid{flex:1;min-width:0}
+.lb-name{font-weight:700;font-size:1rem;color:var(--gold-light);margin-bottom:0.5rem}
+.lb-golfer{display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0;border-top:1px solid rgba(255,255,255,0.05);font-size:0.88rem}
+.lb-golfer-name{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.lb-golfer-right{display:flex;align-items:center;gap:0.4rem;flex-shrink:0}
+.lb-card-right{min-width:60px;text-align:right}
+.lb-prize{color:var(--gold);font-weight:800;font-size:1rem}
+.par-score{font-weight:800;font-size:0.9rem;padding:0.1rem 0.35rem;border-radius:3px;min-width:36px;text-align:center;display:inline-block}
+.par-under{color:#fff;background:#1a6b3a}
+.par-over{color:#fff;background:#7a2020}
+.par-even{color:#fff;background:#3a5a3a}
+.par-pending{color:var(--text-muted)}
+@media(max-width:500px){.lb-golfer-name{max-width:120px}.lb-combined{font-size:1.5rem}}
 .prize-box-label{font-size:0.78rem;color:var(--text-muted)}.prize-box-val{font-size:1.1rem;color:var(--gold);font-weight:700}
 .lb-meta{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.85rem;color:var(--text-muted)}
 .live-badge{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:20px;background:rgba(76,175,118,0.15);color:var(--success);border:1px solid rgba(76,175,118,0.3)}
@@ -868,29 +914,37 @@ function leaderboardPage(user) {
 
   const tableHtml = rows.length === 0
     ? `<div class="empty-state">No confirmed paid entries yet. Check back soon!</div>`
-    : `<div class="table-wrap">
-        <table class="data-table leaderboard-table">
-          <thead><tr>
-            <th>Rank</th><th>Entrant</th><th>Pick 1</th><th>Pick 2</th><th>Pick 3</th>
-            <th class="center">Total</th><th class="center">Prediction</th><th class="center">Prize</th>
-          </tr></thead>
-          <tbody>
-            ${rows.map(r => {
-              const ri = r.rank <= 3 ? ['🥇','🥈','🥉'][r.rank-1] : '#'+r.rank;
-              return `<tr class="${r.rank<=3?'podium-row':''}">
-                <td class="rank-cell">${ri}</td>
-                <td class="name-cell">${esc(r.full_name)}</td>
-                <td>${esc(r.g1n)} <span class="odds-pill">${esc(r.g1o)}</span><br>${r.s1?`<span class="score-inline">${r.sc1>0?r.sc1:'—'}</span>`:''}${r.s1?statusBadge(r.s1.status):''}</td>
-                <td>${esc(r.g2n)} <span class="odds-pill">${esc(r.g2o)}</span><br>${r.s2?`<span class="score-inline">${r.sc2>0?r.sc2:'—'}</span>`:''}${r.s2?statusBadge(r.s2.status):''}</td>
-                <td>${esc(r.g3n)} <span class="odds-pill">${esc(r.g3o)}</span><br>${r.s3?`<span class="score-inline">${r.sc3>0?r.sc3:'—'}</span>`:''}${r.s3?statusBadge(r.s3.status):''}</td>
-                <td class="center score-total">${r.total>0?r.total:'—'}</td>
-                <td class="center">${r.predicted_score}</td>
-                <td class="center ${r.prize>0?'text-gold':''}">${formatPrize(r.prize)}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>`;
+    : rows.map((r, idx) => {
+        const ri = r.rank <= 3 ? ['🥇','🥈','🥉'][r.rank-1] : `#${r.rank}`;
+        const p1 = fmtPar(r.sc1, par, roundsPlayed(r.s1));
+        const p2 = fmtPar(r.sc2, par, roundsPlayed(r.s2));
+        const p3 = fmtPar(r.sc3, par, roundsPlayed(r.s3));
+        const cp = combinedParDisplay(r.s1, r.s2, r.s3, r.sc1, r.sc2, r.sc3, par);
+        const golferRow = (name, odds, sc, p, badge) =>
+          `<div class="lb-golfer">
+            <span class="lb-golfer-name">${esc(name)}</span>
+            <span class="lb-golfer-right">
+              ${p ? `<span class="par-score ${p.cls}">${p.label}</span>` : '<span class="par-score par-pending">—</span>'}
+              ${badge}
+            </span>
+          </div>`;
+        return `<div class="lb-card ${r.rank<=3?'lb-card-podium':''}">
+          <div class="lb-card-left">
+            <div class="lb-rank">${ri}</div>
+            <div class="lb-combined ${cp.cls}">${cp.label}</div>
+            <div class="lb-combined-label">combined</div>
+          </div>
+          <div class="lb-card-mid">
+            <div class="lb-name">${esc(r.full_name)}</div>
+            ${golferRow(r.g1n, r.g1o, r.sc1, p1, r.s1?statusBadge(r.s1.status):'')}
+            ${golferRow(r.g2n, r.g2o, r.sc2, p2, r.s2?statusBadge(r.s2.status):'')}
+            ${golferRow(r.g3n, r.g3o, r.sc3, p3, r.s3?statusBadge(r.s3.status):'')}
+          </div>
+          <div class="lb-card-right">
+            ${r.prize > 0 ? `<div class="lb-prize">${formatPrize(r.prize)}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
 
   return layout('Leaderboard', `
   <div class="hero hero-quail">
@@ -1030,6 +1084,25 @@ a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-light);text-de
 .lb-stat-val{display:block;font-size:1.4rem;font-weight:800;color:var(--gold)}
 .lb-stat-label{display:block;font-size:0.72rem;color:var(--text-muted);text-transform:uppercase}
 .prize-box{background:var(--green-mid);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:0.5rem 1rem;text-align:center;min-width:80px}
+.lb-card{background:var(--green-card);border:1px solid var(--green-border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.75rem;display:flex;gap:1.25rem;align-items:center}
+.lb-card-podium{border-color:var(--gold);background:rgba(200,169,74,0.07)}
+.lb-card-left{display:flex;flex-direction:column;align-items:center;min-width:56px;gap:0.1rem}
+.lb-rank{font-size:1.3rem;font-weight:800;line-height:1}
+.lb-combined{font-size:2rem;font-weight:900;line-height:1;margin-top:0.25rem}
+.lb-combined-label{font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}
+.lb-card-mid{flex:1;min-width:0}
+.lb-name{font-weight:700;font-size:1rem;color:var(--gold-light);margin-bottom:0.5rem}
+.lb-golfer{display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0;border-top:1px solid rgba(255,255,255,0.05);font-size:0.88rem}
+.lb-golfer-name{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.lb-golfer-right{display:flex;align-items:center;gap:0.4rem;flex-shrink:0}
+.lb-card-right{min-width:60px;text-align:right}
+.lb-prize{color:var(--gold);font-weight:800;font-size:1rem}
+.par-score{font-weight:800;font-size:0.9rem;padding:0.1rem 0.35rem;border-radius:3px;min-width:36px;text-align:center;display:inline-block}
+.par-under{color:#fff;background:#1a6b3a}
+.par-over{color:#fff;background:#7a2020}
+.par-even{color:#fff;background:#3a5a3a}
+.par-pending{color:var(--text-muted)}
+@media(max-width:500px){.lb-golfer-name{max-width:120px}.lb-combined{font-size:1.5rem}}
 .prize-box-label{font-size:0.78rem;color:var(--text-muted)}.prize-box-val{font-size:1.1rem;color:var(--gold);font-weight:700}
 .lb-meta{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.85rem;color:var(--text-muted)}
 .live-badge{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;font-weight:600;padding:0.2rem 0.6rem;border-radius:20px;background:rgba(76,175,118,0.15);color:var(--success);border:1px solid rgba(76,175,118,0.3)}
